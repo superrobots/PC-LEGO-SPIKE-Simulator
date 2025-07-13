@@ -1,0 +1,22 @@
+'''get_degrees_counted()
+Retrieves the number of degrees that have been counted by the motor.
+Returns
+The number of degrees that’s been counted.
+Type:integer (a positive or negative whole number, including 0)
+Values:any number
+Errors
+RuntimeError
+The motor has been disconnected from the Port.
+'''
+from spike import Motor
+
+def test_get_degrees_counted():
+    """
+    Test the get_degrees_counted method of the Motor class.
+    """
+    motor = Motor('A')
+
+
+    # Run the motor 90 degrees clockwise
+
+    print(str(motor.get_degrees_counted()))
