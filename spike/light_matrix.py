@@ -1,3 +1,5 @@
+from visualization import HubVisualizer
+
 class Light_matrix:
 	#If ISDEBUG is true. then all modules send debug information through console
 	ISDEBUG = True
@@ -72,111 +74,43 @@ class Light_matrix:
 	ALL_CLOCKS =  "00900:00900:00900:00000:00000"
 	ALL_ARROWS =  "00900:09990:90909:00900:00900"
 	
-	def __init__(self, ) :
-		if(self.ISDEBUG):print("Light Matrix is initialised in debug mode. Simulation change at spike.light_matrix.py ")
+	def __init__(self, visualizer=None) :
+		self.visualizer = visualizer
+		if self.ISDEBUG:
+			print("Light Matrix is initialised in debug mode. Simulation change at spike.light_matrix.py ")
+
+	def _image_string_to_matrix(self, image_string):
+		"""Convert image string like '09090:99999:...' to 5x5 matrix of 1/0."""
+		rows = image_string.split(":")
+		matrix = []
+		for row in rows:
+			matrix.append([1 if c == "9" else 0 for c in row])
+		return matrix
 
 	def show_image(self,image, brightness=100):
-		#w, h = 5, 5
-		#imagematrixRAM = [[0 for x in range(w)] for y in range(h)]
-		if(self.ISDEBUG):print("Shows an image on the Light Matrix.")
-		imagematrix = "default"
-		print("display cleard")
+		if self.ISDEBUG:
+			print("Shows an image on the Light Matrix.")
+		imagematrix = getattr(self, image, None)
+		if imagematrix is None:
+			imagematrix = "00000:00000:00000:00000:00000"
+		matrix = self._image_string_to_matrix(imagematrix)
+		if self.visualizer:
+			self.visualizer.update_light_matrix(matrix)
 
-		
-		if image == "HEART": imagematrix = self.HEART
-		if image == "HEART_SMALL": imagematrix = self.HEART_SMALL
-		if image == "HAPPY": imagematrix = self.HAPPY
-		if image == "SMILE": imagematrix = self.SMILE
-		if image == "SAD": imagematrix = self.SAD
-		if image == "CONFUSED": imagematrix = self.CONFUSED
-		if image == "ANGRY": imagematrix = self.ANGRY
-		if image == "ASLEEP": imagematrix = self.ASLEEP
-		if image == "SURPRISED": imagematrix = self.SURPRISED
-		if image == "SILLY": imagematrix = self.SILLY
-		if image == "FABULOUS": imagematrix = self.FABULOUS
-		if image == "MEH": imagematrix = self.MEH
-		if image == "YES": imagematrix = self.YES
-		if image == "NO": imagematrix = self.NO
-		if image == "CLOCK12": imagematrix = self.CLOCK12
-		if image == "CLOCK1": imagematrix = self.CLOCK1
-		if image == "CLOCK2": imagematrix = self.CLOCK2
-		if image == "CLOCK3": imagematrix = self.CLOCK3
-		if image == "CLOCK4": imagematrix = self.CLOCK4
-		if image == "CLOCK5": imagematrix = self.CLOCK5
-		if image == "CLOCK6": imagematrix = self.CLOCK6
-		if image == "CLOCK7": imagematrix = self.CLOCK7
-		if image == "CLOCK8": imagematrix = self.CLOCK8
-		if image == "CLOCK9": imagematrix = self.CLOCK9
-		if image == "CLOCK10": imagematrix = self.CLOCK10 
-		if image == "CLOCK11": imagematrix = self.CLOCK11
-		if image == "ARROW_N": imagematrix = self.ARROW_N
-		if image == "ARROW_NE": imagematrix = self.ARROW_NE
-		if image == "ARROW_E": imagematrix = self.ARROW_E
-		if image == "ARROW_SE": imagematrix = self.ARROW_SE
-		if image == "ARROW_S": imagematrix = self.ARROW_S
-		if image == "ARROW_SW": imagematrix = self.ARROW_SW
-		if image == "ARROW_W": imagematrix = self.ARROW_W
-		if image == "ARROW_NW": imagematrix = self.ARROW_NW
-		if image == "GO_RIGHT": imagematrix = self.GO_RIGHT
-		if image == "GO_LEFT": imagematrix = self.GO_LEFT
-		if image == "GO_UP": imagematrix = self.GO_UP
-		if image == "GO_DOWN": imagematrix = self.GO_DOWN
-		if image == "TRIANGLE": imagematrix = self.TRIANGLE
-		if image == "TRIANGLE_LEFT": imagematrix = self.TRIANGLE_LEFT
-		if image == "CHESSBOARD": imagematrix = self.CHESSBOARD
-		if image == "DIAMOND": imagematrix = self.DIAMOND
-		if image == "DIAMOND_SMALL": imagematrix = self.DIAMOND_SMALL
-		if image == "SQUARE": imagematrix = self.SQUARE
-		if image == "SQUARE_SMALL": imagematrix = self.SQUARE_SMALL
-		if image == "RABBIT": imagematrix = self.RABBIT
-		if image == "COW": imagematrix = self.COW
-		if image == "MUSIC_CROTCHET": imagematrix = self.MUSIC_CROTCHET
-		if image == "MUSIC_QUAVER": imagematrix = self.MUSIC_QUAVER
-		if image == "MUSIC_QUAVERS": imagematrix = self.MUSIC_QUAVERS
-		if image == "PITCHFORK": imagematrix = self.PITCHFORK
-		if image == "XMAS": imagematrix = self.XMAS
-		if image == "PACMAN": imagematrix = self.PACMAN
-		if image == "TARGET": imagematrix = self.TARGET
-		if image == "TSHIRT": imagematrix = self.TSHIRT
-		if image == "ROLLERSKATE": imagematrix = self.ROLLERSKATE
-		if image == "DUCK": imagematrix = self.DUCK
-		if image == "HOUSE": imagematrix = self.HOUSE
-		if image == "TORTOISE": imagematrix = self.TORTOISE
-		if image == "BUTTERFLY": imagematrix = self.BUTTERFLY
-		if image == "STICKFIGURE": imagematrix = self.STICKFIGURE
-		if image == "GHOST": imagematrix = self.GHOST
-		if image == "SWORD": imagematrix = self.SWORD
-		if image == "GIRAFFE": imagematrix = self.GIRAFFE
-		if image == "SKULL": imagematrix = self.SKULL
-		if image == "UMBRELLA": imagematrix = self.UMBRELLA
-		if image == "SNAKE": imagematrix = self.SNAKE
-		if image == "ALL_CLOCKS": imagematrix = self.ALL_CLOCKS
-		if image == "ALL_ARROWS": imagematrix = self.ALL_ARROWS
-		#if image == "HAPPY": imagematrix = settings.FORCESENSORTYPE
-		splitimagematrix = imagematrix.split(":")
-		matrixrow = ""
-		for y in range (5):
-			for x in range (5):
-				#if(self.ISDEBUG):print(splitimagematrix[y][x],"/",str(x),"/",str(y))
-				if splitimagematrix[y][x]=="9":
-					matrixrow = matrixrow +"X"
-				else:
-					matrixrow = matrixrow +"_"
-			print (matrixrow)
-			matrixrow = ""
-					
-		print("Simulated Image showed name: ", image," image matrix:",imagematrix)
-		if(self.ISDEBUG):print("Image name: ", image," image matrix:",imagematrix)
-	
 	def off(self):
-		if(self.ISDEBUG):print("Light Matrix turned off")
-		print("Simulated display turned off")
-	
+		if self.visualizer:
+			self.visualizer.update_light_matrix([[0]*5 for _ in range(5)])
+
 	def set_pixel(self,x, y, brightness=100):
-		if(self.ISDEBUG):print("Sets the brightness of one pixel (one of the 25 LEDs) on the Light Matrix. x:",str(x)," y:",str(y))
-		print("Sets the brightness of one Simulated pixel (one of the 25 LEDs) on the Light Matrix.")
-	   
+		if self.visualizer:
+			# Get current matrix or create a blank one
+			matrix = [[0]*5 for _ in range(5)]
+			matrix[y][x] = 1 if brightness > 0 else 0
+			self.visualizer.update_light_matrix(matrix)
 
 	def write(self, text):
-		if(self.ISDEBUG):print("Writes a string to the Light Matrix.")
-		print("Writes a string to the Simulated Light Matrix.")
+		# For simplicity, just turn on the center pixel for any text
+		if self.visualizer:
+			matrix = [[0]*5 for _ in range(5)]
+			matrix[2][2] = 1
+			self.visualizer.update_light_matrix(matrix)

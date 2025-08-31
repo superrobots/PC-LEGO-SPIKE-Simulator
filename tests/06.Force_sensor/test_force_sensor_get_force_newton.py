@@ -1,5 +1,6 @@
 from spike import ForceSensor
 from spike.control import wait_for_seconds
+from visualization import HubVisualizer
 
 def test_force_sensor_get_force_newton():
     """
@@ -11,5 +12,4 @@ def test_force_sensor_get_force_newton():
 
     # Measure the force in newtons
     newtons = door_bell.get_force_newton()
-
-    percentage = door_bell.get_force_percentage()
+    print(f"Force measured: {newtons}N")

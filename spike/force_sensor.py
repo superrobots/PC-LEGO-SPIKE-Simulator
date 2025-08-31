@@ -20,8 +20,9 @@ class ForceSensor:
 	#If the measured, simulated value is lower than SIMULATORSWITCHMAX value then the while cycle is over or a press event occurs. (Inverse setting is possible)
 	SIMULATORSWITCHMIN=0
 	
-	def __init__(self,port):
+	def __init__(self,port, visualizer=None):
 		self.port = port
+		self.visualizer = visualizer
 		self.newton = 0
 		self.newton_direction = True
 		self.percentage = 0

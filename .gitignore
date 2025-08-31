@@ -1,3 +1,19 @@
-build
+# Python cache and intermediate files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
 *.egg
-*.egg-info
+*.log
+*.sqlite3
+*.db
+.env
+.DS_Store
+.cache/
+build/
+dist/
+*.bak
+*.swp
+*.tmp
+# VS Code settings
