@@ -76,8 +76,12 @@ def create_light_matrix():
         row_items = []
         for col in range(light_matrix_size):
             # LEDs are slightly recessed into the front face
-            led = Entity(model='cube', color=color.rgb(20, 20, 20), scale=(led_size, led_size, 0.08), 
-                        position=(matrix_start_x+col*0.44, matrix_start_y+row*0.44, hub_front_z))
+            led = Entity(
+                model='cube',
+                color=color.rgb(20, 20, 20),
+                scale=(led_size, led_size, 0.08),
+                position=(matrix_start_x+col*0.44, matrix_start_y+row*0.44, hub_front_z)
+            )
             row_items.append(led)
         light_matrix.append(row_items)
     return light_matrix
