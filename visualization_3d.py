@@ -12,9 +12,8 @@ def create_hub():
         shader=lit_with_shadows_shader
     )
     
-    # Add subtle rounded edges by adding small corner pieces
+    # Add subtle rounded edges by adding small corner pieces as children
     corner_radius = 0.15
-    corners = []
     for x in [-1.25, 1.25]:
         for y in [-0.6, 0.6]:
             for z in [-1.75, 1.75]:
@@ -23,9 +22,9 @@ def create_hub():
                     color=color.rgb(210, 210, 210),
                     scale=corner_radius,
                     position=(x, y, z),
-                    shader=lit_with_shadows_shader
+                    shader=lit_with_shadows_shader,
+                    parent=main_body
                 )
-                corners.append(corner)
     
     return main_body
 
@@ -86,13 +85,14 @@ def create_ports():
             position=(x_left, y_pos, z),
             shader=lit_with_shadows_shader
         )
-        # Inner port hole (darker)
+        # Inner port hole (darker) as child of outer port
         port_inner = Entity(
             model='cube',
             color=color.rgb(20, 20, 20),
             scale=(0.12, 0.25, 0.35),
             position=(x_left - 0.05, y_pos, z),
-            shader=lit_with_shadows_shader
+            shader=lit_with_shadows_shader,
+            parent=port_outer
         )
         ports.append(port_outer)
         Text(text=port_labels[i], position=(x_left-0.28, y_pos+0.2, z), origin=(0,0), scale=1.6, color=color.white)
@@ -106,13 +106,14 @@ def create_ports():
             position=(x_right, y_pos, z),
             shader=lit_with_shadows_shader
         )
-        # Inner port hole (darker)
+        # Inner port hole (darker) as child of outer port
         port_inner = Entity(
             model='cube',
             color=color.rgb(20, 20, 20),
             scale=(0.12, 0.25, 0.35),
             position=(x_right + 0.05, y_pos, z),
-            shader=lit_with_shadows_shader
+            shader=lit_with_shadows_shader,
+            parent=port_outer
         )
         ports.append(port_outer)
         Text(text=port_labels[i+3], position=(x_right+0.28, y_pos+0.2, z), origin=(0,0), scale=1.6, color=color.white)
@@ -180,13 +181,14 @@ def create_light_matrix():
                 position=(matrix_start_x+col*0.48, matrix_start_y+row*0.48, hub_front_z),
                 shader=lit_with_shadows_shader
             )
-            # Add LED lens effect
+            # Add LED lens effect as child of LED base
             led_lens = Entity(
                 model='sphere',
                 color=color.rgb(30, 30, 30),
                 scale=(led_size * 0.7, led_size * 0.7, 0.03),
                 position=(matrix_start_x+col*0.48, matrix_start_y+row*0.48, hub_front_z - 0.04),
-                shader=lit_with_shadows_shader
+                shader=lit_with_shadows_shader,
+                parent=led_base
             )
             row_items.append(led_base)
         light_matrix.append(row_items)
