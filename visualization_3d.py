@@ -1,35 +1,35 @@
 from ursina import *
 
 def create_hub():
-    # White/light gray hub, slightly rounded by scaling
-    return Entity(model='cube', color=color.yellow, scale=(2,1,3), position=(0,0,0))
+    # Light gray hub body matching real LEGO Spike Hub color
+    return Entity(model='cube', color=color.rgb(200, 200, 200), scale=(2.5, 1.2, 3.5), position=(0,0,0))
 
 def create_logo_and_button():
-    # Yellow LEGO logo block on top
-    logo = Entity(model='sphere', color=color.green, scale=(0.5,0.1,0.5), position=(0,0.6,-1.2))
-    Text(text='LEGO', position=(0,0.7,-1.2), origin=(0,0), scale=2, color=color.red)
-    # Green circular button near logo
-    button = Entity(model='cube', color=color.green, scale=(0.18,0.05,0.18), position=(0.5,0.6,-1.2))
+    # Yellow square LEGO logo on the front (matching real hub)
+    logo = Entity(model='cube', color=color.rgb(255, 204, 0), scale=(0.7, 0.05, 0.7), position=(0, 0.7, -1.8))
+    Text(text='LEGO', position=(0, 0.75, -1.8), origin=(0, 0), scale=2, color=color.rgb(200, 0, 0))
+    # Circular Bluetooth/power button (light blue/cyan color)
+    button = Entity(model='sphere', color=color.rgb(100, 200, 240), scale=(0.25, 0.08, 0.25), position=(0.85, 0.7, -1.5))
     return logo, button
 
 def create_ports():
     port_labels = ['A','B','C','D','E','F']
-    # Place ports on left and right sides of top surface, spaced to avoid overlap
-    y_pos = 0.6  # Slightly above hub top
-    x_left = -1.15
-    x_right = 1.15
-    z_positions = [-0.7, -0.25, 0.25, 0.7]  # Spread out more
+    # Place ports on left and right sides of hub, matching real LEGO Spike Hub layout
+    y_pos = 0.1  # Middle height of the hub
+    x_left = -1.35
+    x_right = 1.35
+    z_positions = [-1.0, -0.3, 0.4, 1.1]  # Spread vertically
     ports = []
     for i, z in enumerate(z_positions[:3]):
-        # Left side ports (A, B, C)
-        port = Entity(model='cube', color=color.azure, scale=(0.2,0.2,0.2), position=(x_left, y_pos, z))
+        # Left side ports (A, B, C) - black rectangular ports
+        port = Entity(model='cube', color=color.rgb(40, 40, 40), scale=(0.15, 0.25, 0.35), position=(x_left, y_pos, z))
         ports.append(port)
-        Text(text=port_labels[i], position=(x_left-0.18, y_pos+0.08, z), origin=(0,0), scale=2, color=color.black)
+        Text(text=port_labels[i], position=(x_left-0.22, y_pos+0.15, z), origin=(0,0), scale=1.8, color=color.white)
     for i, z in enumerate(z_positions[:3]):
-        # Right side ports (D, E, F)
-        port = Entity(model='cube', color=color.azure, scale=(0.2,0.2,0.2), position=(x_right, y_pos, z))
+        # Right side ports (D, E, F) - black rectangular ports
+        port = Entity(model='cube', color=color.rgb(40, 40, 40), scale=(0.15, 0.25, 0.35), position=(x_right, y_pos, z))
         ports.append(port)
-        Text(text=port_labels[i+3], position=(x_right+0.18, y_pos+0.08, z), origin=(0,0), scale=2, color=color.black)
+        Text(text=port_labels[i+3], position=(x_right+0.22, y_pos+0.15, z), origin=(0,0), scale=1.8, color=color.white)
     return ports
 
 def create_motors():
@@ -67,16 +67,17 @@ def create_connections(ports, motors, wheels_and_arm):
 def create_light_matrix():
     light_matrix = []
     light_matrix_size = 5
-    led_size = 0.18
-    # Place on top surface of hub (Y is up)
-    hub_top_y = 0.5  # hub center y=0, scale_y=1, so top is at y=+0.5
-    matrix_start_x = -0.36 * (light_matrix_size-1)/2
-    matrix_start_z = -0.36 * (light_matrix_size-1)/2
-    y_pos = hub_top_y + led_size/2 + 0.01  # Slightly above hub
+    led_size = 0.22
+    # Place LED matrix on the front face of hub (Z is forward/back, front is negative Z)
+    hub_front_z = -1.75  # Front face of the hub
+    matrix_start_x = -0.44 * (light_matrix_size-1)/2
+    matrix_start_y = -0.44 * (light_matrix_size-1)/2
     for row in range(light_matrix_size):
         row_items = []
         for col in range(light_matrix_size):
-            led = Entity(model='cube', color=color.black, scale=(led_size,led_size,led_size), position=(matrix_start_x+col*0.36, y_pos, matrix_start_z+row*0.36))
+            # LEDs are slightly recessed into the front face
+            led = Entity(model='cube', color=color.rgb(20, 20, 20), scale=(led_size, led_size, 0.08), 
+                        position=(matrix_start_x+col*0.44, matrix_start_y+row*0.44, hub_front_z))
             row_items.append(led)
         light_matrix.append(row_items)
     return light_matrix
@@ -84,7 +85,8 @@ def create_light_matrix():
 def set_light_matrix(light_matrix, matrix):
     for row in range(len(light_matrix)):
         for col in range(len(light_matrix[row])):
-            light_matrix[row][col].color = color.yellow if matrix[row][col] else color.black
+            # White/bright color when on, dark when off
+            light_matrix[row][col].color = color.rgb(255, 255, 255) if matrix[row][col] else color.rgb(20, 20, 20)
 
 app = Ursina()
 
@@ -101,7 +103,7 @@ matrix = [[1 if i==j else 0 for j in range(5)] for i in range(5)]
 set_light_matrix(light_matrix, matrix)
 
 EditorCamera()
-camera.position = (0,2,-8)
+camera.position = (3, 3, -10)
 camera.look_at(hub)
 
 app.run()
