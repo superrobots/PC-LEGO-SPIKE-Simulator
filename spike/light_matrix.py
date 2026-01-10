@@ -1,4 +1,7 @@
-from visualization import HubVisualizer
+try:
+	from visualization import HubVisualizer
+except ImportError:
+	HubVisualizer = None
 
 class Light_matrix:
 	#If ISDEBUG is true. then all modules send debug information through console
