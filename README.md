@@ -1,6 +1,21 @@
 # PC-LEGO-SPIKE-Simulator
 Unofficial PC based LEGO SPIKE simulator in python environment
 
+## 🌐 NEW: Web-Based Simulator (POC)
+
+A proof-of-concept web-based interface is now available! Test your LEGO SPIKE code directly in your browser without any hardware or complex setup.
+
+**Quick Start:**
+```bash
+pip install -r requirements-web.txt
+python web_simulator.py
+```
+Then open http://localhost:5000 in your browser.
+
+See [WEB_SIMULATOR_README.md](WEB_SIMULATOR_README.md) for full documentation.
+
+---
+
 1.Introduction
 
   LEGO SPIKE is a great educational system for kids to learn the secrets of programming and robot building. The shortcoming of the system is that the program code cannot be tested conveniently. In order to test the written code, it is always necessary to build the complete hardware and the robot's behaviour is the only way to deduce the correct operation. This is what the LEGO SPIKE simulator is trying to help you with. The code written in the LEGO SPIKE environment can be tested without modification, without having a single LEGO hardware element, additional sensor or motor. The results of the simulator can be read on the console. The behaviour of the simulated peripherals can be pre-programmed. You can use a random number generator, but you can also cycle through increasing and decreasing values, or you can enter a value through the console. The program is open source. Some functionalities are not fully implemented.
