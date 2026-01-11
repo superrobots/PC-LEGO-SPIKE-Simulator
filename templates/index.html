@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LEGO SPIKE Web Simulator</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 1400px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+			overflow: hidden;
+		}
+
+		.header {
+			background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);
+			color: white;
+			padding: 20px 30px;
+			text-align: center;
+		}
+
+		.header h1 {
+			font-size: 2em;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+		}
+
+		.header p {
+			margin-top: 10px;
+			opacity: 0.9;
+		}
+
+		.content {
+			display: grid;
+			grid-template-columns: 1fr 400px;
+			gap: 20px;
+			padding: 20px;
+		}
+
+		.left-panel {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		.code-section {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.section-title {
+			font-size: 1.2em;
+			font-weight: bold;
+			color: #333;
+			margin-bottom: 10px;
+			padding-bottom: 5px;
+			border-bottom: 2px solid #FFC107;
+		}
+
+		#code-editor {
+			flex: 1;
+			min-height: 300px;
+			font-family: 'Courier New', monospace;
+			font-size: 14px;
+			padding: 15px;
+			border: 2px solid #ddd;
+			border-radius: 8px;
+			resize: vertical;
+			background: #f8f9fa;
+		}
+
+		.controls {
+			display: flex;
+			gap: 10px;
+			margin-top: 10px;
+		}
+
+		.btn {
+			padding: 12px 24px;
+			font-size: 16px;
+			font-weight: bold;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-transform: uppercase;
+		}
+
+		.btn-primary {
+			background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+			color: white;
+			flex: 1;
+		}
+
+		.btn-primary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+		}
+
+		.btn-secondary {
+			background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+			color: white;
+		}
+
+		.btn-secondary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+		}
+
+		.btn-load {
+			background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+			color: white;
+		}
+
+		.btn-load:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+		}
+
+		.btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+			transform: none !important;
+		}
+
+		.console-section {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+
+		#console-output {
+			flex: 1;
+			min-height: 200px;
+			background: #1e1e1e;
+			color: #00ff00;
+			font-family: 'Courier New', monospace;
+			font-size: 13px;
+			padding: 15px;
+			border-radius: 8px;
+			overflow-y: auto;
+			white-space: pre-wrap;
+			word-wrap: break-word;
+		}
+
+		.right-panel {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		.simulator-hub {
+			background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+			border-radius: 12px;
+			padding: 20px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+		}
+
+		.led-matrix {
+			display: grid;
+			grid-template-columns: repeat(5, 1fr);
+			gap: 8px;
+			margin: 20px auto;
+			width: fit-content;
+			background: #333;
+			padding: 15px;
+			border-radius: 8px;
+		}
+
+		.led {
+			width: 40px;
+			height: 40px;
+			background: #222;
+			border-radius: 50%;
+			transition: all 0.3s ease;
+			box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+		}
+
+		.led.on {
+			background: #ffcc00;
+			box-shadow: 0 0 20px #ffcc00, inset 0 2px 4px rgba(255,204,0,0.5);
+		}
+
+		.sensor-status {
+			background: white;
+			border-radius: 8px;
+			padding: 15px;
+			margin-top: 15px;
+		}
+
+		.sensor-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 10px;
+			margin: 5px 0;
+			background: #f5f5f5;
+			border-radius: 6px;
+		}
+
+		.sensor-label {
+			font-weight: bold;
+			color: #555;
+		}
+
+		.sensor-value {
+			color: #4CAF50;
+			font-weight: bold;
+			font-family: monospace;
+		}
+
+		.examples-section {
+			background: white;
+			border-radius: 8px;
+			padding: 15px;
+		}
+
+		.example-btn {
+			width: 100%;
+			text-align: left;
+			padding: 10px;
+			margin: 5px 0;
+			background: #f5f5f5;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.2s ease;
+		}
+
+		.example-btn:hover {
+			background: #e8e8e8;
+			border-color: #FFC107;
+		}
+
+		.status-bar {
+			background: #263238;
+			color: white;
+			padding: 10px 20px;
+			text-align: center;
+			font-size: 14px;
+		}
+
+		.status-bar.success {
+			background: #4CAF50;
+		}
+
+		.status-bar.error {
+			background: #f44336;
+		}
+
+		@media (max-width: 1024px) {
+			.content {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h1>🤖 LEGO SPIKE Web Simulator</h1>
+			<p>Test your LEGO SPIKE Python code in the browser - no hardware required!</p>
+		</div>
+
+		<div class="content">
+			<div class="left-panel">
+				<div class="code-section">
+					<div class="section-title">Python Code Editor</div>
+					<textarea id="code-editor" placeholder="Enter your LEGO SPIKE Python code here...">from spike import PrimeHub
+from spike.control import wait_for_seconds
+
+# Initialize the Hub
+hub = PrimeHub()
+
+# Show a smiley face
+hub.light_matrix.show_image('HAPPY')
+wait_for_seconds(1)
+
+# Turn off the display
+hub.light_matrix.off()
+</textarea>
+					<div class="controls">
+						<button id="run-btn" class="btn btn-primary">▶ Run Code</button>
+						<button id="clear-btn" class="btn btn-secondary">Clear</button>
+						<button id="reset-btn" class="btn btn-load">Reset Simulator</button>
+					</div>
+				</div>
+
+				<div class="console-section">
+					<div class="section-title">Console Output</div>
+					<div id="console-output">Ready to run code...</div>
+				</div>
+			</div>
+
+			<div class="right-panel">
+				<div class="simulator-hub">
+					<div class="section-title" style="color: white; border-color: white;">SPIKE Hub</div>
+					<div class="led-matrix" id="led-matrix">
+						<!-- 5x5 LED grid will be generated by JavaScript -->
+					</div>
+
+					<div class="sensor-status">
+						<div class="sensor-item">
+							<span class="sensor-label">Status Light</span>
+							<span class="sensor-value" id="status-light">OFF</span>
+						</div>
+						<div class="sensor-item">
+							<span class="sensor-label">Speaker</span>
+							<span class="sensor-value" id="speaker-status">Ready</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="examples-section">
+					<div class="section-title">Example Programs</div>
+					<button class="example-btn" data-example="simple">Simple Output</button>
+					<button class="example-btn" data-example="motor">Motor Control</button>
+					<button class="example-btn" data-example="sensor">Distance Sensor</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="status-bar" id="status-bar">Ready</div>
+	</div>
+
+	<script>
+		// Initialize LED matrix
+		const ledMatrix = document.getElementById('led-matrix');
+		for (let i = 0; i < 25; i++) {
+			const led = document.createElement('div');
+			led.className = 'led';
+			led.dataset.index = i;
+			ledMatrix.appendChild(led);
+		}
+
+		// Example programs
+		const examples = {
+			simple: `from spike import PrimeHub
+from spike.control import wait_for_seconds
+
+# Initialize the Hub
+hub = PrimeHub()
+
+# Show a smiley face
+hub.light_matrix.show_image('HAPPY')
+wait_for_seconds(1)
+
+# Turn off the display
+hub.light_matrix.off()`,
+
+			motor: `from spike import Motor
+
+# Initialize a motor on port A
+motor = Motor('A')
+
+# Run motor for 360 degrees
+motor.run_for_degrees(360, speed=50)
+
+# Get motor position
+position = motor.get_position()
+print("Motor position:", position)`,
+
+			sensor: `from spike import DistanceSensor
+
+# Initialize distance sensor on port E
+sensor = DistanceSensor('E')
+
+# Get distance in centimeters
+distance = sensor.get_distance_cm()
+print("Distance:", distance, "cm")
+
+# Get distance as percentage
+percentage = sensor.get_distance_percentage()
+print("Distance:", percentage, "%")`
+		};
+
+		// Load example
+		document.querySelectorAll('.example-btn').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const example = btn.dataset.example;
+				document.getElementById('code-editor').value = examples[example];
+				updateStatus('Example loaded: ' + btn.textContent, 'success');
+			});
+		});
+
+		// Run code
+		document.getElementById('run-btn').addEventListener('click', async () => {
+			const code = document.getElementById('code-editor').value;
+			const runBtn = document.getElementById('run-btn');
+			const consoleOutput = document.getElementById('console-output');
+			
+			runBtn.disabled = true;
+			consoleOutput.textContent = 'Running...\n';
+			updateStatus('Executing code...', '');
+
+			try {
+				const response = await fetch('/api/run', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ code: code })
+				});
+
+				const data = await response.json();
+
+				if (data.success) {
+					consoleOutput.textContent = data.output.join('\n') || 'Code executed successfully (no output)';
+					updateStatus('Code executed successfully!', 'success');
+				} else {
+					consoleOutput.textContent = 'ERROR:\n' + data.error + '\n\n' + data.output.join('\n');
+					updateStatus('Error: ' + data.error, 'error');
+				}
+			} catch (error) {
+				consoleOutput.textContent = 'Network error: ' + error.message;
+				updateStatus('Network error occurred', 'error');
+			} finally {
+				runBtn.disabled = false;
+			}
+		});
+
+		// Clear console
+		document.getElementById('clear-btn').addEventListener('click', () => {
+			document.getElementById('console-output').textContent = '';
+			updateStatus('Console cleared', 'success');
+		});
+
+		// Reset simulator
+		document.getElementById('reset-btn').addEventListener('click', async () => {
+			try {
+				const response = await fetch('/api/reset', {
+					method: 'POST'
+				});
+				const data = await response.json();
+				
+				document.getElementById('console-output').textContent = 'Simulator reset';
+				
+				// Reset LED matrix
+				document.querySelectorAll('.led').forEach(led => {
+					led.classList.remove('on');
+				});
+				
+				updateStatus('Simulator reset successfully', 'success');
+			} catch (error) {
+				updateStatus('Reset failed', 'error');
+			}
+		});
+
+		function updateStatus(message, type) {
+			const statusBar = document.getElementById('status-bar');
+			statusBar.textContent = message;
+			statusBar.className = 'status-bar ' + type;
+		}
+
+		// Allow Ctrl+Enter to run code
+		document.getElementById('code-editor').addEventListener('keydown', (e) => {
+			if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+				document.getElementById('run-btn').click();
+			}
+		});
+	</script>
+</body>
+</html>
