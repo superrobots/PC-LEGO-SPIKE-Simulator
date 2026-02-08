@@ -473,6 +473,78 @@ print("Distance:", percentage, "%")`
 				document.getElementById('run-btn').click();
 			}
 		});
+
+		// Poll for status light updates
+		let pollingInterval = null;
+		
+		function startPolling() {
+			if (pollingInterval) return;
+			pollingInterval = setInterval(async () => {
+				try {
+					const response = await fetch('/api/status');
+					const data = await response.json();
+					
+					// Update status light display
+					const statusLightElement = document.getElementById('status-light');
+					if (data.status_light && data.status_light.is_on) {
+						const color = data.status_light.color || 'white';
+						statusLightElement.textContent = color.toUpperCase();
+						statusLightElement.style.color = getColorHex(color);
+					} else {
+						statusLightElement.textContent = 'OFF';
+						statusLightElement.style.color = '#4CAF50';
+					}
+					
+					// Update LED matrix
+					if (data.light_matrix) {
+						updateLEDMatrix(data.light_matrix);
+					}
+				} catch (error) {
+					console.error('Polling error:', error);
+				}
+			}, 100); // Poll every 100ms
+		}
+		
+		function stopPolling() {
+			if (pollingInterval) {
+				clearInterval(pollingInterval);
+				pollingInterval = null;
+			}
+		}
+		
+		function updateLEDMatrix(matrix) {
+			for (let row = 0; row < 5; row++) {
+				for (let col = 0; col < 5; col++) {
+					const index = row * 5 + col;
+					const led = document.querySelector(`.led[data-index="${index}"]`);
+					if (matrix[row][col]) {
+						led.classList.add('on');
+					} else {
+						led.classList.remove('on');
+					}
+				}
+			}
+		}
+		
+		function getColorHex(color) {
+			const colorMap = {
+				'azure': '#007FFF',
+				'black': '#000000',
+				'blue': '#0000FF',
+				'cyan': '#00FFFF',
+				'green': '#00FF00',
+				'orange': '#FFA500',
+				'pink': '#FFC0CB',
+				'red': '#FF0000',
+				'violet': '#8B00FF',
+				'yellow': '#FFFF00',
+				'white': '#FFFFFF'
+			};
+			return colorMap[color.toLowerCase()] || '#4CAF50';
+		}
+		
+		// Start polling when page loads
+		startPolling();
 	</script>
 </body>
 </html>
