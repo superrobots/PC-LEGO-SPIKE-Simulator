@@ -9,13 +9,18 @@ class PrimeHub:
 	PORT_F = "F"
 
 	
-	def __init__(self):
+	def __init__(self, visualizer=None):
+		# Check for web visualizer in global scope (for web simulator)
+		if visualizer is None:
+			import builtins
+			visualizer = getattr(builtins, '__web_visualizer__', None)
+		
 		self.left_button = left_button.Left_button()
 		self.right_button = right_button.Right_button()
 		self.speaker = speaker.Speaker()
-		self.light_matrix = light_matrix.Light_matrix()
+		self.light_matrix = light_matrix.Light_matrix(visualizer)
 		self.motion_sensor = motion_sensor.Motion_sensor() 
-		self.status_light = status_light.Status_light() 
+		self.status_light = status_light.Status_light(visualizer) 
 	
 class ForceSensor:
 	def __init__(self,port):

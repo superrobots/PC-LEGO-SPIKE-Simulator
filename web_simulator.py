@@ -20,8 +20,18 @@ execution_lock = Lock()
 simulator_state = {
 	'console_output': [],
 	'light_matrix': [[0]*5 for _ in range(5)],
+	'status_light': {'color': None, 'is_on': False},
 	'last_error': None
 }
+
+class WebVisualizer:
+	"""Simple visualizer for web simulator that updates global state"""
+	def update_light_matrix(self, matrix):
+		simulator_state['light_matrix'] = matrix
+	
+	def update_status_light(self, color, is_on):
+		simulator_state['status_light'] = {'color': color, 'is_on': is_on}
+
 
 class OutputCapture:
 	"""Captures stdout and stderr during code execution"""
@@ -59,10 +69,19 @@ def run_code():
 			# Capture output
 			output_capture = OutputCapture()
 			
+			# Create a visualizer for this execution
+			visualizer = WebVisualizer()
+			
+			# Inject visualizer into builtins so spike modules can access it
+			import builtins
+			old_visualizer = getattr(builtins, '__web_visualizer__', None)
+			builtins.__web_visualizer__ = visualizer
+			
 			# Create a safe execution environment
 			exec_globals = {
 				'__builtins__': __builtins__,
-				'print': lambda *args, **kwargs: output_capture.write(' '.join(map(str, args)) + '\n')
+				'print': lambda *args, **kwargs: output_capture.write(' '.join(map(str, args)) + '\n'),
+				'__web_visualizer__': visualizer  # Make visualizer available
 			}
 			
 			# Redirect stdout and stderr
@@ -79,6 +98,12 @@ def run_code():
 			finally:
 				sys.stdout = old_stdout
 				sys.stderr = old_stderr
+				# Restore old visualizer in builtins
+				if old_visualizer is None:
+					if hasattr(builtins, '__web_visualizer__'):
+						delattr(builtins, '__web_visualizer__')
+				else:
+					builtins.__web_visualizer__ = old_visualizer
 			
 			# Get the captured output
 			output = output_capture.get_output()
@@ -105,6 +130,7 @@ def get_status():
 	return jsonify({
 		'console_output': simulator_state['console_output'],
 		'light_matrix': simulator_state['light_matrix'],
+		'status_light': simulator_state['status_light'],
 		'last_error': simulator_state['last_error']
 	})
 
@@ -114,6 +140,7 @@ def reset_simulator():
 	with execution_lock:
 		simulator_state['console_output'] = []
 		simulator_state['light_matrix'] = [[0]*5 for _ in range(5)]
+		simulator_state['status_light'] = {'color': None, 'is_on': False}
 		simulator_state['last_error'] = None
 		
 		return jsonify({
